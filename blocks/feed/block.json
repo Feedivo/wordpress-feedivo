@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "feedivo/feed",
+	"title": "Feedivo Feed",
+	"category": "widgets",
+	"icon": "format-gallery",
+	"description": "Add a fast, customizable social media feed from your Feedivo account.",
+	"keywords": [ "instagram", "facebook", "threads", "pinterest", "youtube", "social" ],
+	"textdomain": "feedivo",
+	"attributes": {
+		"feedUuid": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"editorScript": "feedivo-block-editor",
+	"style": "feedivo",
+	"viewScript": "feedivo"
+}

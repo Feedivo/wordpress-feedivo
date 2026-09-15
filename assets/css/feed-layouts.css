@@ -1,0 +1,1064 @@
+/**
+ * Feedivo — Darstellung eines Feeds und seiner Beitragskarten. Das EINE
+ * Feed-Stylesheet, geteilt von App, Widget und WordPress-Plugin.
+ *
+ * In sich geschlossen: nur --feed-*-Eigenschaften, keine externen Variablen.
+ * Jede Deklaration trägt !important gegen Theme-CSS der Host-Seite; die
+ * --feed-*-Eigenschaften bleiben ungeflaggt, damit spätere Regeln sie setzen.
+ * Farbwerte stehen als Hex (#rrggbbaa), nie als rgba(): manche Optimierer
+ * verwerfen eine Deklaration, die eine Farbfunktion mit !important kombiniert.
+ *
+ * Container:
+ *   <div class="feed-layout feed-layout--<family> feed-variant--<variant>
+ *               feed-aspect--<square|portrait|tall|landscape|original>
+ *               feed-gap--<tight|normal|wide> feed-cols--<1..6>"> … </div>
+ * Optional: .feed-corners--square, .feed-hover--off, .feed-peek--on,
+ * data-feed-autoplay="off" und --feed-accent als Inline-Token.
+ * Familien: grid · masonry · list · carousel.
+ *
+ * Jeder gestaltende Selektor kommt im ausgelieferten HTML vor; Zustandsklassen
+ * tragen keine Gestaltung. Sonst verwirft ein „nicht benutztes CSS"-Durchlauf
+ * die Regel, weil er am gerenderten HTML entscheidet.
+ */
+
+/* Gemeinsamer Rahmen aller Feed-Ausgaben, zugleich Query-Container: das Layout
+   richtet sich nach seiner Breite, nicht nach dem Viewport. */
+.feed-embed {
+    container-type: inline-size !important;
+    container-name: feedivo !important;
+}
+
+/* Jede Feed-Hülle braucht eine ausdrückliche Breite: als Flex-Item einer
+   umbrechenden Spalten-Anordnung kollabiert width:auto auf nahezu null. Ohne
+   !important, damit eine von der Host-Seite gesetzte Breite gewinnt; die
+   gedoppelte Elementor-Klasse hält gegen dessen Basis-CSS. */
+.feedivo-widget,
+.feedivo-feed,
+.wp-block-feedivo-feed,
+.elementor-widget.elementor-widget-feedivo-feed {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Reset gegen Theme-Stile für Eigenschaften, die die Regeln unten nicht selbst
+   setzen (Bildrahmen, -radien, -schatten, box-sizing). Die Lightbox hängt an
+   <body> und braucht deshalb einen eigenen Geltungsbereich. */
+.feed-embed,
+.feed-embed *,
+.feed-embed *::before,
+.feed-embed *::after,
+.feedivo-lightbox,
+.feedivo-lightbox *,
+.feedivo-lightbox *::before,
+.feedivo-lightbox *::after {
+    box-sizing: border-box !important;
+}
+.feed-embed img,
+.feed-embed video,
+.feedivo-lightbox img,
+.feedivo-lightbox video {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Design-Token, auch auf .feed-embed: der „Mehr laden"-Button hängt dort und
+   damit außerhalb von .feed-layout. */
+.feed-embed,
+.feed-layout {
+    --feed-cols: 4;
+    --feed-gap: 10px;
+    /* Breite des angeschnittenen Streifens der nächsten Karussell-Kachel;
+       0 heißt, es passen genau --feed-cols Kacheln. Gesetzt von .feed-peek--on. */
+    --feed-peek: 0px;
+    --feed-radius: 12px;
+    --feed-bg: #e9eef0;
+    --feed-card-bg: #fff;
+    --feed-border: #1f29331a;
+    --feed-text: #1f2933;
+    --feed-muted: #6b7785;
+    --feed-accent: #40b8a9;
+    --feed-chip-bg: #0000008c;
+    --feed-scrim: #1f2933d1;
+}
+
+.feed-layout {
+    margin: 0 !important;
+}
+
+/* Abstandsstufen (Grid, Masonry, Karussell) */
+.feed-gap--tight  { --feed-gap: 3px; }
+.feed-gap--normal { --feed-gap: 10px; }
+.feed-gap--wide   { --feed-gap: 22px; }
+
+.feed-corners--square { --feed-radius: 0px; }
+
+/* Spaltenzahl als Klasse statt als Inline-Token. Damit setzen die
+   Breakpoint-Regeln literale Werte, und weder in repeat() noch im Divisor der
+   Karussell-Formel steht je eine Rechnung: bei einer Spalte ergäbe „eine
+   weniger" repeat(0) und eine Division durch null. */
+.feed-cols--1 { --feed-cols: 1; }
+.feed-cols--2 { --feed-cols: 2; }
+.feed-cols--3 { --feed-cols: 3; }
+.feed-cols--4 { --feed-cols: 4; }
+.feed-cols--5 { --feed-cols: 5; }
+.feed-cols--6 { --feed-cols: 6; }
+
+/* Schmaler Container: höchstens zwei Spalten, ein Karussell zeigt genau eine
+   Kachel. Tablet-breit: eine Spalte weniger, nie unter zwei. Ein einspaltiger
+   Feed bleibt auf jeder Breite einspaltig. Die Karussell-Regel steht zuletzt,
+   sie hat dieselbe Spezifität wie die Spaltenklassen. */
+@container feedivo (max-width: 540px) {
+    .feed-cols--3,
+    .feed-cols--4,
+    .feed-cols--5,
+    .feed-cols--6 { --feed-cols: 2; }
+    .feed-layout--carousel { --feed-cols: 1; }
+}
+@container feedivo (min-width: 540.02px) and (max-width: 820px) {
+    .feed-cols--3 { --feed-cols: 2; }
+    .feed-cols--4 { --feed-cols: 3; }
+    .feed-cols--5 { --feed-cols: 4; }
+    .feed-cols--6 { --feed-cols: 5; }
+}
+
+/* Grid */
+.feed-layout--grid {
+    display: grid !important;
+    grid-template-columns: repeat(var(--feed-cols), minmax(0, 1fr)) !important;
+    gap: var(--feed-gap) !important;
+}
+.feed-layout--grid.feed-variant--seamless { gap: 0 !important; }
+.feed-layout--grid.feed-variant--seamless .post-card { border-radius: 0 !important; }
+
+/* Mosaik: quadratische Kacheln, jede siebte spannt 2×2. Das Verhältnis ist
+   fest 1:1, damit die Spans aufgehen. */
+.feed-layout--grid.feed-variant--mosaic { grid-auto-flow: dense !important; }
+.feed-layout--grid.feed-variant--mosaic .post-card { aspect-ratio: 1 / 1 !important; }
+.feed-layout--grid.feed-variant--mosaic .post-card:nth-child(7n + 1) {
+    grid-column: span 2 !important;
+    grid-row: span 2 !important;
+}
+/* Bei einer Spalte gibt es nichts zu verdoppeln — der Span erzwänge sonst eine
+   zweite Spalte. Steht nach der Regel darüber, gleiche Spezifität. */
+.feed-cols--1.feed-variant--mosaic .post-card:nth-child(7n + 1) {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+}
+
+/* Masonry über CSS-Grid; Kacheln behalten ihr natürliches Verhältnis. Ohne JS
+   bleibt es ein gewöhnliches Raster, erst `is-masonry` versetzt die Kacheln
+   über berechnete Zeilen-Spans. */
+.feed-layout--masonry {
+    display: grid !important;
+    grid-template-columns: repeat(var(--feed-cols), minmax(0, 1fr)) !important;
+    gap: var(--feed-gap) !important;
+    align-items: start !important;
+}
+/* Den Versatz schaltet JS ein, indem es grid-auto-rows und row-gap inline
+   setzt — nicht über eine Klasse: die stünde beim Zuschnitt durch einen
+   CSS-Optimierer nicht im HTML und die Regel wäre weg. */
+.feed-layout--masonry .post-card {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    aspect-ratio: auto !important;
+}
+.feed-layout--masonry .post-card > img { height: auto !important; }
+
+/* Nahtloses Masonry: Abstand über den Token nullen, nicht über gap. */
+.feed-layout--masonry.feed-variant--seamless { --feed-gap: 0px; }
+.feed-layout--masonry.feed-variant--seamless .post-card { border-radius: 0 !important; }
+
+/* Karussell: Snap-Scroller ohne sichtbare Bildlaufleiste; Pfeile und Automatik
+   setzt JS. */
+.feed-carousel { position: relative !important; }
+.feed-layout--carousel {
+    display: flex !important;
+    gap: var(--feed-gap) !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;          /* Slider, kein Scrollbereich */
+}
+.feed-layout--carousel::-webkit-scrollbar { display: none !important; }
+.feed-layout--carousel .post-card {
+    flex: 0 0 calc((100% - (var(--feed-cols) - 1) * var(--feed-gap) - var(--feed-peek)) / var(--feed-cols)) !important;
+    scroll-snap-align: start !important;
+}
+
+/* Anschnitt: die Kacheln werden um einen festen Betrag schmaler, sodass am
+   rechten Rand ein Streifen der nächsten sichtbar bleibt. Der Betrag steckt im
+   Token, nicht in einer eigenen flex-basis-Regel. */
+.feed-layout.feed-peek--on { --feed-peek: 3.25rem; }
+
+.feed-carousel-arrow {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: #1f29338c !important;
+    color: #fff !important;
+    font-size: 1.5rem !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: background-color .15s ease, opacity .15s ease !important;
+}
+.feed-carousel-arrow:hover:not(:disabled) { background: #1f2933cc !important; }
+.feed-carousel-arrow[hidden] { display: none !important; }
+/* Am Anfang und Ende des Streifens: sichtbar, aber wirkungslos. */
+.feed-carousel-arrow:disabled { opacity: .35 !important; cursor: default !important; }
+.feed-carousel-prev { left: .4rem !important; }
+.feed-carousel-next { right: .4rem !important; }
+/* Bühne: eine große Slide, gedeckelt auf 520px. Der Anschnitt wird von der
+   gedeckelten Breite abgezogen, nicht mit ihr verglichen. */
+.feed-layout--carousel.feed-variant--hero .post-card {
+    flex-basis: calc(min(100%, 520px) - var(--feed-peek)) !important;
+}
+
+/* Karten-Variante im Karussell: kein Anheben beim Überfahren, der Zoom bleibt;
+   Polsterung am Track für Haarlinien und Ruheschatten. */
+.feed-layout--carousel .post-card:hover { transform: none !important; box-shadow: none !important; }
+.feed-layout--carousel.feed-variant--cards { padding: 2px 2px 22px !important; }
+.feed-layout--carousel.feed-variant--cards .post-card:hover {
+    box-shadow: 0 1px 2px #1f29330d, 0 6px 18px #1f29330f !important;
+}
+
+/* Nahtloses Karussell: Abstand über den Token nullen, die Kachelbreite rechnet
+   mit var(--feed-gap). */
+.feed-layout--carousel.feed-variant--seamless { --feed-gap: 0px; }
+.feed-layout--carousel.feed-variant--seamless .post-card { border-radius: 0 !important; }
+
+/* Filmstreifen: feste Zeilenhöhe, die Breite folgt dem Medium. max-width: none
+   am Bild, sonst verzerrt der 100-%-Reset die erzwungene Höhe. */
+.feed-layout--carousel.feed-variant--strip { align-items: stretch !important; }
+.feed-layout--carousel.feed-variant--strip .post-card {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: 340px !important;
+    aspect-ratio: auto !important;
+}
+.feed-layout--carousel.feed-variant--strip .post-card > img {
+    width: auto !important;
+    height: 100% !important;
+    max-width: none !important;
+}
+.feed-layout--carousel.feed-variant--strip .post-card__placeholder {
+    width: auto !important;
+    height: 100% !important;
+}
+@container feedivo (max-width: 540px) {
+    .feed-layout--carousel.feed-variant--strip .post-card { height: 240px !important; }
+}
+
+/* Seitenverhältnis (Grid und Karussell; Masonry bleibt immer im Original) */
+.feed-aspect--square    .post-card { aspect-ratio: 1 / 1 !important; }
+.feed-aspect--portrait  .post-card { aspect-ratio: 4 / 5 !important; }
+.feed-aspect--tall      .post-card { aspect-ratio: 9 / 16 !important; }
+.feed-aspect--landscape .post-card { aspect-ratio: 16 / 9 !important; }
+.feed-aspect--original  .post-card { aspect-ratio: auto !important; }
+.feed-aspect--original  .post-card > img { height: auto !important; }
+/* Masonry ignoriert das Seitenverhältnis. Diese Wiederholung steht nach den
+   .feed-aspect--*-Regeln, damit sie bei gleicher Spezifität gewinnt. */
+.feed-layout--masonry .post-card { aspect-ratio: auto !important; }
+.feed-layout--masonry .post-card > img { height: auto !important; }
+
+/* Karten-Variante: Bild oben, Text als geschlossene Karte darunter. */
+.feed-variant--cards .post-card {
+    aspect-ratio: auto !important;
+    background: var(--feed-card-bg) !important;
+    border: 1px solid var(--feed-border) !important;
+    box-shadow: 0 1px 2px #1f29330d, 0 6px 18px #1f29330f !important;
+}
+.feed-variant--cards .post-card > img,
+.feed-variant--cards .post-card__placeholder { aspect-ratio: 1 / 1 !important; height: auto !important; }
+.feed-aspect--portrait.feed-variant--cards .post-card > img,
+.feed-aspect--portrait.feed-variant--cards .post-card__placeholder { aspect-ratio: 4 / 5 !important; }
+.feed-aspect--tall.feed-variant--cards .post-card > img,
+.feed-aspect--tall.feed-variant--cards .post-card__placeholder { aspect-ratio: 9 / 16 !important; }
+.feed-aspect--landscape.feed-variant--cards .post-card > img,
+.feed-aspect--landscape.feed-variant--cards .post-card__placeholder { aspect-ratio: 16 / 9 !important; }
+.feed-aspect--original.feed-variant--cards .post-card > img,
+.feed-aspect--original.feed-variant--cards .post-card__placeholder { aspect-ratio: auto !important; }
+/* Textblock unter dem Bild: Datum als Vorzeile, danach Autor und Text.
+   Umsortiert per Flex, die DOM-Reihenfolge bleibt Autor/Text/Datum. */
+.feed-variant--cards .post-card__scrim {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: none !important;
+    color: var(--feed-text) !important;
+    padding: .9rem 1.1rem 1.05rem !important;
+}
+.feed-variant--cards .post-card__author { font-size: .78rem !important; margin-bottom: .25rem !important; }
+.feed-variant--cards .post-card__caption {
+    -webkit-line-clamp: 3 !important;
+    font-size: .88rem !important;
+    line-height: 1.55 !important;
+    text-shadow: none !important;
+}
+.feed-variant--cards .post-card__date {
+    order: -1 !important;
+    margin: 0 0 .4rem !important;
+    color: var(--feed-muted) !important;
+    opacity: 1 !important;
+    font-size: .66rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .08em !important;
+}
+/* In der Karten-Variante bleibt die Rückmeldung auf dem Bild: die Karte behält
+   ihren Ruheschatten, die Überlagerung bildet das aspect-ratio des Bildes nach
+   und bleibt damit auf den Medienbereich begrenzt. */
+.feed-variant--cards .post-card:hover {
+    transform: none !important;
+    box-shadow: 0 1px 2px #1f29330d, 0 6px 18px #1f29330f !important;
+}
+.feed-variant--cards .post-card__hover {
+    inset: 0 0 auto 0 !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+}
+.feed-aspect--portrait.feed-variant--cards .post-card__hover { aspect-ratio: 4 / 5 !important; }
+.feed-aspect--tall.feed-variant--cards .post-card__hover { aspect-ratio: 9 / 16 !important; }
+.feed-aspect--landscape.feed-variant--cards .post-card__hover { aspect-ratio: 16 / 9 !important; }
+/* Im Originalverhältnis gibt es keine Überlagerung, der Zoom bleibt. */
+.feed-aspect--original.feed-variant--cards .post-card__hover { display: none !important; }
+
+/* Masonry-Karten folgen dem natürlichen Bildverhältnis. Ohne feste Bildhöhe
+   lässt sich die Überlagerung nicht auf das Bild begrenzen, sie entfällt. */
+.feed-layout--masonry.feed-variant--cards .post-card > img { aspect-ratio: auto !important; }
+.feed-layout--masonry.feed-variant--cards .post-card__hover { display: none !important; }
+
+/* Beitragskarte */
+.post-card {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background: var(--feed-bg) !important;
+    border-radius: var(--feed-radius) !important;
+    overflow: hidden !important;
+    aspect-ratio: 1 / 1 !important;
+    cursor: pointer !important;
+    transition: box-shadow .18s ease, transform .18s ease !important;
+    /* Karten sind <button> bzw. <a>; Button-Vorgaben fremder Themes werden
+       neutralisiert, damit Texte normal umbrechen. */
+    white-space: normal !important;
+    font-family: inherit !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+}
+.post-card:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 .75rem 1.5rem #1f293329 !important;
+}
+/* Nahtlose Mosaike bleiben bündig: kein Anheben, nur Zoom und Pille. */
+.feed-variant--seamless .post-card:hover { transform: none !important; box-shadow: none !important; }
+.post-card:focus-visible { outline: 3px solid var(--feed-accent) !important; outline-offset: 2px !important; }
+/* Anker-Vorgaben neutralisieren, wenn die Karte ein <a> ist. */
+a.post-card, a.post-row__media { text-decoration: none !important; color: inherit !important; }
+
+/* Inline-Glyphen, wie eine Icon-Schrift dimensioniert. */
+svg.bi {
+    width: 1em !important;
+    height: 1em !important;
+    fill: currentColor !important;
+    vertical-align: -.125em !important;
+    flex-shrink: 0 !important;
+}
+
+/* Die Medien-Regeln nutzen den Kind-Kombinator, damit sie eingebettete Bilder
+   in der Bildunterschrift (etwa Emoji-Grafiken) nicht mit erfassen. */
+.post-card > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    transition: transform .4s cubic-bezier(.2, .6, .25, 1) !important;
+}
+.post-card:hover > img { transform: scale(1.06) !important; }
+
+/* Platzhalter für den Medienbereich, wenn ein Beitrag kein Bild hat; bringt
+   sein eigenes quadratisches Verhältnis mit. */
+.post-card__placeholder {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    font-size: 2rem !important;
+    color: var(--feed-muted) !important;
+}
+
+.post-card__chip {
+    position: absolute !important;
+    top: .5rem !important;
+    left: .5rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .25rem !important;
+    padding: .22rem .55rem !important;
+    font-size: .7rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    box-shadow: 0 1px 4px #1f293347 !important;
+}
+/* Ersatzfüllung mit Spezifität 0, damit .badge-platform-* gewinnt. */
+:where(.post-card__chip) { background: var(--feed-chip-bg) !important; }
+.post-card__chip i,
+.post-card__chip .bi { font-size: 1em !important; }
+.post-card__chip svg { width: 12px !important; height: 12px !important; }
+
+.post-card__type {
+    position: absolute !important;
+    top: .5rem !important;
+    right: .5rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1.6rem !important;
+    height: 1.6rem !important;
+    font-size: .85rem !important;
+    color: #fff !important;
+    background: #1f293380 !important;
+    border-radius: 999px !important;
+    box-shadow: 0 1px 4px #1f293347 !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+}
+
+.post-card__scrim {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    padding: 2.5rem .75rem .65rem !important;
+    text-align: left !important;
+    color: #fff !important;
+    background: linear-gradient(to top, var(--feed-scrim) 0%, #1f29336b 55%, #1f293300 100%) !important;
+    pointer-events: none !important;
+}
+.post-card__author  { display: block !important; font-size: .72rem !important; font-weight: 700 !important; margin-bottom: .1rem !important; }
+.post-card__caption {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    overflow: hidden !important;
+    font-size: .78rem !important;
+    line-height: 1.4 !important;
+    text-shadow: 0 1px 2px #1f293366 !important;
+}
+.post-card__date {
+    display: block !important;
+    font-size: .68rem !important;
+    font-weight: 500 !important;
+    opacity: .78 !important;
+    margin-top: .2rem !important;
+    letter-spacing: .02em !important;
+}
+
+/* Zeile oben links: Plattform-Chip und Duplikat-Hinweis. */
+.post-card__tags {
+    position: absolute !important;
+    top: .5rem !important;
+    left: .5rem !important;
+    right: 2.5rem !important; /* Abstand zum Typ-Icon oben rechts */
+    display: flex !important;
+    align-items: center !important;
+    gap: .3rem !important;
+    flex-wrap: wrap !important;
+}
+.post-card__tags .post-card__chip { position: static !important; }
+
+/* Duplikat-Hinweis: Pille über dem Bild, in der Listenzeile im Fließtext. */
+.post-card__also {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .2rem !important;
+    max-width: 100% !important;
+    font-size: .62rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    padding: .2rem .4rem !important;
+    border-radius: 999px !important;
+    color: #fff !important;
+    background: #1f29339e !important;
+    box-shadow: 0 1px 4px #1f293347 !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+}
+.post-card__also .bi { font-size: 1em !important; }
+.post-card__also-text { overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+.post-card__also-edit { opacity: .75 !important; }
+.post-card__also--editable { cursor: pointer !important; pointer-events: auto !important; position: relative !important; z-index: 3 !important; }
+.post-card__also--editable:hover { background: #1f2933d9 !important; }
+.post-row__meta .post-card__also { color: var(--feed-muted) !important; background: #1f293314 !important; font-weight: 500 !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.post-row__meta .post-card__also--editable:hover { background: #1f293329 !important; }
+
+.post-card__hover {
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #1f293361 !important;
+    opacity: 0 !important;
+    transition: opacity .18s ease !important;
+    /* Rein optisch: darf keine Klicks schlucken. */
+    pointer-events: none !important;
+}
+.post-card__hover-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .4rem !important;
+    padding: .5rem .95rem !important;
+    font-size: .78rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    color: var(--feed-text) !important;
+    background: #fffffff0 !important;
+    border-radius: 999px !important;
+    box-shadow: 0 .35rem .9rem #1f293347 !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    transform: translateY(8px) scale(.96) !important;
+    transition: transform .18s ease !important;
+}
+.post-card__hover .bi { font-size: 1em !important; color: var(--feed-accent) !important; }
+.post-card:hover .post-card__hover,
+.post-card:focus-visible .post-card__hover { opacity: 1 !important; }
+.post-card:hover .post-card__hover-pill,
+.post-card:focus-visible .post-card__hover-pill { transform: translateY(0) scale(1) !important; }
+
+/* Bei reduzierter Bewegung bleiben die Hover-Zustände, die Bewegung entfällt. */
+@media (prefers-reduced-motion: reduce) {
+    .post-card,
+    .post-card > img,
+    .post-card__hover,
+    .post-card__hover-pill { transition: none !important; }
+    .post-card:hover { transform: none !important; }
+    .post-card:hover > img { transform: none !important; }
+    .post-card__hover-pill { transform: none !important; }
+}
+
+/* Hover-Effekt je Feed abschaltbar; die Info-Überlagerung bleibt. */
+.feed-hover--off .post-card,
+.feed-hover--off .post-card > img,
+.feed-hover--off .post-card__hover,
+.feed-hover--off .post-card__hover-pill { transition: none !important; }
+.feed-hover--off .post-card:hover { transform: none !important; box-shadow: none !important; }
+.feed-hover--off .post-card:hover > img { transform: none !important; }
+.feed-hover--off .post-card__hover-pill { transform: none !important; }
+.feed-hover--off .post-row__media:hover { box-shadow: none !important; }
+/* Die Karten-Variante behält ihren Ruheschatten auch ohne Hover-Effekt. */
+.feed-hover--off.feed-variant--cards .post-card:hover {
+    box-shadow: 0 1px 2px #1f29330d, 0 6px 18px #1f29330f !important;
+}
+
+/* Liste */
+.feed-layout--list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+}
+
+.post-row {
+    display: flex !important;
+    gap: 1rem !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+}
+.feed-layout--list > .post-row:not(:first-child) {
+    border-top: 1px solid var(--feed-border) !important;
+    padding-top: 1.5rem !important;
+}
+.post-row__media {
+    white-space: normal !important;
+    font-family: inherit !important;
+    position: relative !important;
+    flex: 0 0 160px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: var(--feed-radius) !important;
+    overflow: hidden !important;
+    background: var(--feed-bg) !important;
+    padding: 0 !important;
+    border: 0 !important;
+    cursor: pointer !important;
+    transition: box-shadow .15s ease !important;
+}
+.post-row__media:hover { box-shadow: 0 .5rem 1rem #1f29332e !important; }
+.post-row__media:focus-visible { outline: 3px solid var(--feed-accent) !important; outline-offset: 2px !important; }
+.post-row__media .post-card__type { top: .4rem !important; right: .4rem !important; }
+.post-row__media > img { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block !important; }
+.post-row__body { flex: 1 1 auto !important; min-width: 0 !important; }
+.post-row__meta {
+    display: flex !important;
+    align-items: center !important;
+    gap: .5rem !important;
+    flex-wrap: wrap !important;
+    margin-bottom: .35rem !important;
+    font-size: .8rem !important;
+    color: var(--feed-muted) !important;
+}
+.post-row__meta .post-card__chip { position: static !important; }
+/* Anker und <button> sehen gleich aus. */
+.post-row__source {
+    margin-left: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .3rem !important;
+    color: var(--feed-accent) !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    background: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+}
+/* Ein langer Nutzername ohne Trennstelle liefe in schmalen Spalten über den
+   Rand — pre-line erhält Umbrüche, bricht aber keine Wörter. */
+.post-row__caption {
+    color: var(--feed-text) !important;
+    font-size: .95rem !important;
+    line-height: 1.5 !important;
+    white-space: pre-line !important;
+    overflow-wrap: anywhere !important;
+}
+.post-row__author { font-weight: 600 !important; color: var(--feed-text) !important; }
+
+/* Zeitstrahl-Variante: gestapelt, mit vollem Text; das Medium bekommt eine
+   Höchstbreite. */
+.feed-variant--timeline .post-row { flex-direction: column !important; gap: .75rem !important; }
+.feed-variant--timeline .post-row__media {
+    flex-basis: auto !important;
+    width: 100% !important;
+    max-width: 560px !important;
+    aspect-ratio: 4 / 3 !important;
+}
+
+/* „Mehr laden" und Leerhinweis */
+.feed-loadmore-wrap { text-align: center !important; margin-top: 1.25rem !important; }
+/* Token mit Fallback-Werten: der Button hängt in .feed-embed, aber außerhalb
+   von .feed-layout. */
+.feed-loadmore {
+    display: inline-block !important;
+    padding: .55rem 1.4rem !important;
+    border: 1px solid var(--feed-accent, #40b8a9) !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: var(--feed-accent, #40b8a9) !important;
+    font: inherit !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+}
+.feed-loadmore:hover { background: var(--feed-accent, #40b8a9) !important; color: #fff !important; }
+.feed-loadmore[disabled] { opacity: .6 !important; cursor: wait !important; }
+/* Button-Resets fremder Themes neutralisieren, wie bei .post-card. */
+.feed-loadmore { text-transform: none !important; letter-spacing: normal !important; white-space: nowrap !important; }
+
+/* Lightbox (.feedivo-lightbox); Markup und Verhalten stehen in
+   feed-frontend.js. Ab Desktop zwei Spalten: Medien links (2/3), scrollbare
+   Details rechts (1/3), mobil gestapelt. */
+.feedivo-lightbox {
+    position: fixed !important;
+    inset: 0 !important;
+    /* dvh folgt der ein- und ausklappenden Browserleiste; ohne das ist die
+       Karte auf iOS oben und unten angeschnitten. vh bleibt als Vorstufe. */
+    height: 100vh !important;
+    height: 100dvh !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    /* Oben Platz für den Schließen-Knopf, der mobil über der Karte sitzt. */
+    padding: 3.5rem .75rem .75rem !important;
+    background: #0f1216e0 !important;
+}
+.feedivo-lightbox[hidden] { display: none !important; }
+
+.feedivo-lightbox-inner {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: min(1140px, 94vw) !important;
+    /* Genau der Raum, den das Overlay abzüglich seiner Polsterung anbietet. */
+    max-height: 100% !important;
+    background: var(--feed-card-bg, #fff) !important;
+    /* Folgt dem Ecken-Schalter des Feeds; feed-frontend.js reicht das Token
+       beim Öffnen herein, weil die Lightbox außerhalb von .feed-embed steht. */
+    border-radius: var(--feed-radius, 1rem) !important;
+    overflow: hidden !important;
+    box-shadow: 0 1.5rem 4rem #00000073 !important;
+}
+
+/* Medien-Spalte */
+.feedivo-lightbox-media {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #0f1216 !important;
+    min-height: 0 !important;
+}
+.feedivo-lightbox-media > img,
+.feedivo-lightbox-media > video {
+    width: 100% !important;
+    max-height: 55vh !important;
+    max-height: 55dvh !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+.feedivo-lightbox-media > img[hidden],
+.feedivo-lightbox-media > video[hidden] { display: none !important; }
+
+/* Externer Player: 16:9-iframe statt <video>, per JS injiziert. */
+.feedivo-lightbox-embed {
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    max-height: 55vh !important;
+    max-height: 55dvh !important;
+}
+.feedivo-lightbox-embed iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: 0 !important;
+    display: block !important;
+}
+.feedivo-lightbox-embed[hidden] { display: none !important; }
+
+/* Blättern in der Galerie (Karussell-Beiträge) */
+.feedivo-lightbox-nav {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 2 !important;
+    width: 36px !important;
+    height: 36px !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: #0000008c !important;
+    color: #fff !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    cursor: pointer !important;
+}
+.feedivo-lightbox-nav[hidden] { display: none !important; }
+.feedivo-lightbox-prev { left: 10px !important; }
+.feedivo-lightbox-next { right: 10px !important; }
+
+.feedivo-lightbox-count {
+    position: absolute !important;
+    bottom: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    padding: 2px 10px !important;
+    border-radius: 99px !important;
+    background: #0000008c !important;
+    color: #fff !important;
+    font-size: 12px !important;
+}
+.feedivo-lightbox-count[hidden] { display: none !important; }
+
+/* Video: Vorschaubild mit zentriertem Abspielknopf, der das Original öffnet. */
+.feedivo-lightbox-play {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 4.5rem !important;
+    height: 4.5rem !important;
+    border-radius: 50% !important;
+    background: #0000008c !important;
+    color: #fff !important;
+    font-size: 2rem !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    transition: background-color .15s ease, transform .15s ease !important;
+}
+.feedivo-lightbox-play:hover {
+    background: #000000c7 !important;
+    transform: translate(-50%, -50%) scale(1.06) !important;
+    color: #fff !important;
+}
+.feedivo-lightbox-play[hidden] { display: none !important; }
+
+/* Detail-Spalte */
+.feedivo-lightbox-details {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+.feedivo-lightbox-details-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100% !important;
+    padding: 1.25rem !important;
+    color: var(--feed-text, #1f2933) !important;
+}
+
+.feedivo-lightbox-badge {
+    align-self: flex-start !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .3rem !important;
+    margin-bottom: .75rem !important;
+    padding: .3rem .6rem !important;
+    font-size: .75rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    background: var(--feed-chip-bg, #0000008c) !important;
+}
+.feedivo-lightbox-badge[hidden] { display: none !important; }
+.feedivo-lightbox-badge svg { width: 13px !important; height: 13px !important; }
+
+/* Benutzername, wie auf der Karte vor der Bildunterschrift. */
+.feedivo-lightbox-author {
+    display: block !important;
+    margin-bottom: .35rem !important;
+    font-size: .85rem !important;
+    font-weight: 600 !important;
+    color: var(--feed-text, #1f2933) !important;
+}
+.feedivo-lightbox-author[hidden] { display: none !important; }
+
+.feedivo-lightbox-caption {
+    white-space: pre-line !important;
+    margin: 0 0 .75rem !important;
+    font-size: .9rem !important;
+    line-height: 1.5 !important;
+}
+.feedivo-lightbox-date {
+    margin-bottom: 1rem !important;
+    font-size: .8rem !important;
+    color: var(--feed-muted, #6b7785) !important;
+}
+
+.feedivo-lightbox-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .4rem !important;
+    margin-top: auto !important;
+    padding: .5rem .9rem !important;
+    border: 1px solid var(--feed-accent, #40b8a9) !important;
+    border-radius: .5rem !important;
+    color: var(--feed-accent, #40b8a9) !important;
+    font-size: .85rem !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: background-color .15s ease, color .15s ease !important;
+}
+.feedivo-lightbox-link:hover { background: var(--feed-accent, #40b8a9) !important; color: #fff !important; }
+.feedivo-lightbox-link[hidden] { display: none !important; }
+
+/* Mobil steht der Knopf ÜBER der Karte am Rand des Overlays, nicht auf dem
+   Medium: dort liegen die Bedienelemente des Videoplayers, und auf iOS sitzt
+   die Ton-Schaltfläche genau in dieser Ecke. Ab Tablet sitzt er wieder in der
+   Karte — dort ist die Ecke die Detail-Spalte, also kein Medium. */
+.feedivo-lightbox-close {
+    position: fixed !important;
+    top: max(.5rem, env(safe-area-inset-top)) !important;
+    right: max(.5rem, env(safe-area-inset-right)) !important;
+    z-index: 3 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+    color: #1f2933 !important;
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 4px #0000004d !important;
+}
+
+/* Desktop: zwei Spalten mit einer gemeinsamen festen Höhe, nur die Details
+   scrollen. */
+@media (min-width: 768px) {
+    .feedivo-lightbox { padding: 24px !important; }
+    .feedivo-lightbox-close {
+        position: absolute !important;
+        top: .6rem !important;
+        right: .6rem !important;
+        width: 2rem !important;
+        height: 2rem !important;
+    }
+    .feedivo-lightbox-inner {
+        flex-direction: row !important;
+        height: min(88vh, 820px) !important;
+        height: min(88dvh, 820px) !important;
+        max-height: none !important;
+    }
+    .feedivo-lightbox-media { flex: 2 1 0 !important; min-width: 0 !important; height: 100% !important; }
+    .feedivo-lightbox-media > img,
+    .feedivo-lightbox-media > video { height: 100% !important; max-height: none !important; }
+    .feedivo-lightbox-embed { max-height: 100% !important; }
+    .feedivo-lightbox-details { flex: 1 1 0 !important; min-width: 0 !important; height: 100% !important; }
+}
+
+/* Emoji-Schutz: WordPress ersetzt Emoji in Bildunterschriften durch
+   <img class="emoji">/<img class="wp-smiley">. Hier auf Textgröße festgelegt,
+   damit sie nicht wie Beitragsmedien aussehen. */
+.feed-embed img.emoji,
+.feed-embed img.wp-smiley,
+.feedivo-lightbox img.emoji,
+.feedivo-lightbox img.wp-smiley {
+    display: inline !important;
+    width: 1em !important;
+    height: 1em !important;
+    max-width: 1em !important;
+    margin: 0 .07em !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
+    vertical-align: -.1em !important;
+    object-fit: contain !important;
+    aspect-ratio: auto !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Hinweiszeile unter eingebetteten Feeds. */
+.feedivo-branding {
+    margin: .6rem 0 0;
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1.4;
+}
+.feedivo-branding a {
+    color: #5b6670;
+    text-decoration: none;
+    opacity: .85;
+}
+.feedivo-branding a:hover,
+.feedivo-branding a:focus {
+    text-decoration: underline;
+    opacity: 1;
+}
+
+/* Nur im WordPress-Plugin sichtbar: Einzelbeitrag-Ansicht und die zwei
+   Hinweise. Ohne !important, das ist Inhalt im Theme-Fluss. */
+.feedivo-single-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+    margin-bottom: 1em;
+}
+.feedivo-single-gallery img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+}
+
+/* Eingebetteter Player auf der Beitragsseite: das Vorschaltbild wird beim
+   Klick gegen den iframe getauscht — vorher geht keine Anfrage hinaus. */
+.feedivo-single-embed {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    margin: 0 0 1em;
+}
+.feedivo-single-embed iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 10px;
+    display: block;
+}
+.feedivo-embed-facade {
+    position: relative;
+    display: block;
+    margin: 0 0 1em;
+    line-height: 0;
+}
+.feedivo-embed-facade img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+}
+.feedivo-embed-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #0000008c;
+    color: #fff;
+    font-size: 34px;
+    line-height: 1;
+    transition: background-color .15s ease;
+}
+.feedivo-embed-facade:hover .feedivo-embed-play { background: #000000c7; }
+
+.feedivo-single-footer {
+    margin-top: 1em;
+    padding-top: .75em;
+    border-top: 1px solid #00000014;
+    font-size: .9em;
+}
+
+.feedivo-feed-missing {
+    padding: .75em 1em;
+    border: 1px dashed #d63638;
+    border-radius: 8px;
+    color: #d63638;
+    font-size: .9em;
+}
+
+.feedivo-paused-notice {
+    margin-bottom: .75rem;
+    padding: .6rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: .75rem;
+    background: #f8fafc;
+    color: #5b6670;
+    font-size: .85em;
+    text-align: center;
+}
+
+/* Markenfarben der Plattformen. Stehen zuletzt, damit sie gegen die gleich
+   spezifischen Ersatzhintergründe gewinnen. */
+.badge-platform-instagram { background: linear-gradient(45deg, #f09433, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888) !important; }
+.badge-platform-facebook  { background: #1877f2 !important; }
+.badge-platform-threads   { background: #000000 !important; }
+.badge-platform-pinterest { background: #e60023 !important; }
+.badge-platform-youtube   { background: #ff0000 !important; }
+.badge-platform-website   { background: #4f46e5 !important; }

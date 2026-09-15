@@ -1,0 +1,582 @@
+# Copyright (C) 2026 Feedivo
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Feedivo 1.18.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/feedivo\n"
+"POT-Creation-Date: 2026-08-19 00:44+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: GNU gettext\n"
+"X-Domain: feedivo\n"
+
+#: assets/js/feedivo-block.js:19 includes/class-feedivo-elementor-widget.php:89
+msgid "— Select a feed —"
+msgstr ""
+
+#: assets/js/feedivo-block.js:98 assets/js/feedivo-block.js:112
+#: includes/class-feedivo-admin-page.php:385
+#: includes/class-feedivo-elementor-widget.php:47
+#: includes/class-feedivo-elementor-widget.php:55
+msgid "Feed"
+msgstr ""
+
+#: assets/js/feedivo-block.js:104
+#: includes/class-feedivo-elementor-widget.php:59
+msgid "Choose the design and content for this feed in Feedivo."
+msgstr ""
+
+#: assets/js/feedivo-block.js:123 assets/js/feedivo-block.js:148
+#: includes/class-feedivo-elementor-widget.php:20
+#: includes/class-feedivo-post-type.php:74
+msgid "Feedivo Feed"
+msgstr ""
+
+#: assets/js/feedivo-block.js:124
+msgid "Connect this website to Feedivo to choose one of your social media feeds."
+msgstr ""
+
+#: assets/js/feedivo-block.js:130
+msgid "Open Feedivo settings"
+msgstr ""
+
+#: assets/js/feedivo-block.js:150
+msgid "This feed is not available. Update your content or choose another feed."
+msgstr ""
+
+#: assets/js/feedivo-block.js:151
+msgid "Choose a social media feed to display."
+msgstr ""
+
+#: feedivo.php:48
+msgid "Every 5 minutes (Feedivo)"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:53
+#: includes/class-feedivo-admin-page.php:92
+msgid "Settings"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:77
+msgid "Documentation"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:82
+msgid "Support"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:91
+msgid "Feedivo Settings"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:238
+msgid "One or more Feedivo connections need your attention. Reconnect them below to keep your feeds up to date."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:244
+msgid "Connect this site to Feedivo"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:246
+msgid "New to Feedivo?"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:247
+msgid "Create a free account, connect your social channels and design your first feed. Then return here with its connection ID."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:250
+#: includes/class-feedivo-admin-page.php:293
+msgid "Create a free Feedivo account"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:254
+msgid "Paste the connection ID from your Feedivo account. Your feeds, content and design stay easy to manage in one place."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:265
+msgid "Danger zone"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:266
+msgid "Delete all posts and media imported by Feedivo while keeping the connection. Your Feedivo account is not changed, and the next update imports the content again."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:268
+msgid "Delete all content imported by Feedivo from this website? This cannot be undone."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:271
+msgid "Delete imported content"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:289
+msgid "Create a beautiful social media feed for your WordPress website."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:290
+msgid "Connect your channels in Feedivo, choose your content and publish it here with one connection ID."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:296
+msgid "Connect an existing Feedivo account"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:309
+msgid "Connection ID"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:313
+msgid "Find this ID on the WordPress connection page in your Feedivo account. You can add more connections at any time."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:314
+msgid "Connect"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:323
+msgid "Connections"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:327
+msgid "Connection"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:328
+msgid "Status"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:329
+#: includes/class-feedivo-admin-page.php:380
+msgid "Feeds"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:340
+msgid "Active"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:342
+msgid "Paused by your plan"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:344
+msgid "Needs reconnect"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:350
+msgid "Disconnect this connection? Its imported content will be removed from this website. Content shared with another connection will stay."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:354
+msgid "Disconnect"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:362
+msgid "Add another connection"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:367
+msgid "Disconnect all Feedivo connections and remove their imported content from this website? This cannot be undone."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:370
+msgid "Disconnect all connections"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:386
+msgid "Posts"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:387
+msgid "Shortcode"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:401
+msgid "Your feeds will appear here after the first update."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:413
+msgid "Archive pages"
+msgstr ""
+
+#. translators: 1: archive URL path, 2: feed category URL path
+#: includes/class-feedivo-admin-page.php:418
+#, php-format
+msgid "Feedivo can create an overview at %1$s and a page for each feed below %2$s. Hide these pages if you only want feeds to appear where you add them."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:430
+msgid "Turn off the archive pages"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:434
+msgid "Individual post links remain available. Your blocks, shortcodes and Elementor widgets continue to work as usual."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:436
+msgid "Save"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:450
+msgid "Updates"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:454
+msgid "Feedivo is updating your content…"
+msgstr ""
+
+#. translators: 1: date/time, 2: number of posts
+#: includes/class-feedivo-admin-page.php:460
+#, php-format
+msgid "Last update: %1$s (%2$d posts)."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:466
+msgid "No update has completed yet."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:475
+msgid "The last update needs attention:"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:482
+#: includes/class-feedivo-admin-page.php:553
+msgid "Technical details"
+msgstr ""
+
+#. translators: %s: date/time of the next scheduled sync
+#: includes/class-feedivo-admin-page.php:496
+#, php-format
+msgid "Next automatic update: %s."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:500
+msgid "Automatic updates are not scheduled. Reactivate the plugin to restore them."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:507
+msgid "Update now"
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:524
+msgid "Connected to Feedivo. Your content is ready; larger feeds continue updating in the background."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:525
+msgid "Connected to Feedivo. Your first update will start shortly."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:526
+msgid "Enter a valid connection ID from your Feedivo account."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:527
+msgid "Connecting to Feedivo failed."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:528
+msgid "Your Feedivo content is up to date."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:529
+msgid "Content updated. Larger feeds continue in the background."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:530
+msgid "Your update is queued and will start shortly."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:531
+msgid "An update is already running."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:532
+#: includes/class-feedivo-api-client.php:41
+#: includes/class-feedivo-api-client.php:98
+msgid "Not connected to Feedivo yet."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:533
+msgid "Connection disconnected — its content is being removed in the background."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:534
+msgid "Disconnected. All imported Feedivo content is being removed in the background."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:535
+msgid "Your Feedivo content is being removed in the background."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:536
+msgid "Archive pages turned off. The single post pages stay reachable."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:537
+msgid "Archive pages turned on."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:593
+msgid "Feedivo could not be reached. The next update will try again automatically."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:597
+msgid "This connection ID is unknown. Check it on the WordPress connection's page in your Feedivo account."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:600
+msgid "This connection is no longer authorized — it was deleted in Feedivo or another site connected with the same ID. Reconnect it with its connection ID, or disconnect it here."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:603
+msgid "This connection is paused by your Feedivo plan. In Feedivo, choose which connections stay active or switch to a suitable plan. Reconnecting will not help."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:607
+msgid "Feedivo is receiving many requests right now. The next update will try again automatically."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:612
+#: includes/class-feedivo-api-client.php:121
+#: includes/class-feedivo-sync.php:192
+msgid "Unexpected response from the Feedivo API."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:616
+msgid "The request to Feedivo failed."
+msgstr ""
+
+#: includes/class-feedivo-admin-page.php:654
+msgid "You are not allowed to do this."
+msgstr ""
+
+#: includes/class-feedivo-block.php:64 includes/class-feedivo-shortcode.php:38
+msgid "This Feedivo feed is not available. Update your content or choose another feed. This message is only visible to administrators."
+msgstr ""
+
+#: includes/class-feedivo-elementor-widget.php:73
+msgid "Choose a Feedivo feed in the widget settings."
+msgstr ""
+
+#: includes/class-feedivo-frontend.php:47
+msgid "View original post"
+msgstr ""
+
+#. translators: %s: platform name (Instagram/Facebook/Threads)
+#. translators: %s: platform name
+#: includes/class-feedivo-frontend.php:49
+#: includes/class-feedivo-frontend.php:163
+#, php-format
+msgid "View on %s"
+msgstr ""
+
+#: includes/class-feedivo-frontend.php:50
+msgid "Loading…"
+msgstr ""
+
+#: includes/class-feedivo-frontend.php:51
+#: includes/class-feedivo-frontend.php:141
+msgid "Play video"
+msgstr ""
+
+#: includes/class-feedivo-frontend.php:53
+msgid "Post"
+msgstr ""
+
+#: includes/class-feedivo-frontend.php:54
+msgid "Image"
+msgstr ""
+
+#. translators: joins a position and a total, as in "Image 2 of 5"
+#: includes/class-feedivo-frontend.php:56
+msgid "of"
+msgstr ""
+
+#: includes/class-feedivo-frontend.php:147
+msgid "Watch video on the original platform"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:43
+#: includes/class-feedivo-post-type.php:46
+msgid "Social Posts"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:44
+msgid "Social Post"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:45
+msgid "Feedivo"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:47
+msgid "Search social posts"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:48
+msgid "No social posts yet. They appear automatically after the first update."
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:50
+msgid "Social media posts imported by Feedivo."
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:73
+#: includes/class-feedivo-post-type.php:75
+msgid "Feedivo Feeds"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:77
+msgid "Your social media feeds from Feedivo."
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:137
+msgid "Platform"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:138
+msgid "Source"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:139
+msgid "Date"
+msgstr ""
+
+#: includes/class-feedivo-post-type.php:154
+msgid "View original"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:36
+msgid "This feed is currently paused and not being updated."
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:72
+msgid "Load more"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:83
+msgid "Previous"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:84
+msgid "Next"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:109
+msgid "Provided by"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:128
+msgid "Close"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:130
+msgid "Previous image"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:135
+msgid "Next image"
+msgstr ""
+
+#: includes/class-feedivo-renderer.php:402
+#: includes/class-feedivo-renderer.php:409
+#: includes/class-feedivo-renderer.php:508
+msgid "View post"
+msgstr ""
+
+#. translators: lightbox timestamp format (PHP date), e.g. "d.m.Y, H:i \U\h\r" in German
+#: includes/class-feedivo-renderer.php:444
+msgid "d.m.Y, H:i"
+msgstr ""
+
+#. translators: date format (PHP date) used in image alt text
+#: includes/class-feedivo-renderer.php:564
+msgid "d.m.Y"
+msgstr ""
+
+#. translators: 1: platform name (e.g. Instagram), 2: date
+#. translators: 1: platform name, 2: date
+#: includes/class-feedivo-renderer.php:569 includes/class-feedivo-sync.php:506
+#, php-format
+msgid "%1$s post from %2$s"
+msgstr ""
+
+#. translators: %s: date
+#: includes/class-feedivo-renderer.php:576
+#, php-format
+msgid "Post from %s"
+msgstr ""
+
+#. translators: %s: feed UUID.
+#: includes/class-feedivo-sync.php:313
+#, php-format
+msgid "Feed %s: unexpected response from the Feedivo API."
+msgstr ""
+
+#. Plugin URI of the plugin
+#: feedivo.php
+msgid "https://feedivo.de/wordpress"
+msgstr ""
+
+#. Description of the plugin
+#: feedivo.php
+msgid "Create fast, privacy-friendly social media feeds for Instagram, Facebook, Threads, Pinterest and YouTube. Gutenberg, Elementor and shortcode ready."
+msgstr ""
+
+#. Author URI of the plugin
+#: feedivo.php
+msgid "https://feedivo.de"
+msgstr ""
+
+#. Title of the block
+#: blocks/feed/block.json
+msgctxt "block title"
+msgid "Feedivo Feed"
+msgstr ""
+
+#. Description of the block
+#: blocks/feed/block.json
+msgctxt "block description"
+msgid "Add a fast, customizable social media feed from your Feedivo account."
+msgstr ""
+
+#. Keyword of the block
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "instagram"
+msgstr ""
+
+#. Keyword of the block
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "facebook"
+msgstr ""
+
+#. Keyword of the block
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "threads"
+msgstr ""
+
+#. Keyword of the block
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "pinterest"
+msgstr ""
+
+#. Keyword of the block
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "youtube"
+msgstr ""
+
+#. Keyword of the block
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "social"
+msgstr ""
